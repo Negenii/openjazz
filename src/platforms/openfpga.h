@@ -33,13 +33,12 @@
 #define NO_KEYBOARD_CFG
 
 // Video config: the Pocket's panel is 1600x1440 (10:9). 320x288 fills it at
-// an exact 5x integer scale with square pixels; 320x200 reproduces the
-// original 4:3 geometry (taller-than-wide pixels) with bars top and bottom.
-// The player picks between them in the core's own menu; see openfpga.cpp.
+// an exact 5x integer scale with square pixels and is the default; the player can
+// switch to 320x200 (original 4:3 geometry, bars top and bottom) or 320x240 in
+// Setup Options -> Video, which persists in the config file.
 #define DEFAULT_SCREEN_WIDTH 320
-#define DEFAULT_SCREEN_HEIGHT (OpenfpgaPlatform::screenHeight())
+#define DEFAULT_SCREEN_HEIGHT 288
 #define FULLSCREEN_ONLY
-#define NO_RESIZE
 
 // Input: the SDK shim reports the pad as keyboard events
 // (up/down/left/right -> arrows, A -> LCTRL, B -> SPACE, X -> LALT,
@@ -62,8 +61,6 @@ class OpenfpgaPlatform final : public IPlatform {
 		void AddGamePaths() override;
 
 		void ErrorNoDatafiles() override;
-
-		static int screenHeight();
 };
 
 #endif
