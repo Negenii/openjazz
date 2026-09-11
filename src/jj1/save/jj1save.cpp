@@ -19,6 +19,7 @@
 #include "jj1save.h"
 #include "util.h"
 #include "io/log.h"
+#include <ctime>
 
 /* This algorithm has been found out by CYBERDEViL by analysing the Assembly in
  * DoxBox-X. For more information see: https://codeberg.org/CYBERDEV/JJSave/
