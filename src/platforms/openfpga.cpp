@@ -27,6 +27,7 @@
 #ifndef OF_PC
 extern "C" {
 #include "of_file.h"
+#include "of_interact.h"
 #include "of_mount.h"
 #include "of_video.h"
 }
@@ -59,6 +60,24 @@ void OpenfpgaPlatform::AddGamePaths() {
 	// hardware and by cwd on desktop. main.cpp adds "" as GAME|CONFIG|TEMP
 	// later, but has_temp would enable the HTML logfile; we only want CONFIG.
 	gamePaths.add(createString(""), PATH_TYPE_CONFIG);
+}
+
+/* Core-menu option "Aspect Ratio": 0 = fullscreen 10:9 (320x288),
+ * 1 = original 4:3 (320x200). of_interact_get() takes the variable's
+ * position in interact.json's "variables" array (0-based), not its "id"
+ * field; interact.json currently declares 6 variables ahead of this one
+ * (Enable Analogizer, SNAC Adapter, SNAC Controller Assignment, Analogizer
+ * Video Out, Video H Offset, Video V Offset), so Aspect Ratio is index 6.
+ * Read once: the Pocket applies menu changes on core reload, and the
+ * engine queries the height on every video reset. */
+int OpenfpgaPlatform::screenHeight() {
+#ifdef OF_PC
+	return 288;
+#else
+	static int height;
+	if (!height) height = (of_interact_get(6) & 1) ? 200 : 288;
+	return height;
+#endif
 }
 
 void OpenfpgaPlatform::ErrorNoDatafiles() {
