@@ -26,6 +26,7 @@
 #include "gameshell.h"
 #include "gp2x_wiz_canoo.h"
 #include "haiku.h"
+#include "openfpga.h"
 #include "psp.h"
 #include "psvita.h"
 #include "riscos.h"

@@ -20,7 +20,9 @@
 IPlatform::~IPlatform() {}
 
 IPlatform* IPlatform::make() {
-#if defined(__HAIKU__)
+#if defined(OPENFPGA)
+	return new OpenfpgaPlatform();
+#elif defined(__HAIKU__)
 	return new HaikuPlatform();
 #elif defined(PSP)
 	return new PspPlatform();
