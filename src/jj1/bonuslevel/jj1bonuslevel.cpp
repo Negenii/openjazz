@@ -613,6 +613,24 @@ int JJ1BonusLevel::step () {
 }
 
 
+/* nX in the floor loop below is ITOF(x) / canvasW, an integer division per
+ * pixel that depends only on x and the canvas width. Tabulate it once per
+ * width: the values are identical to the ones the division produced, so the
+ * floor is pixel-for-pixel unchanged. */
+static fixed* bonusNX = NULL;
+static int bonusNXWidth = 0;
+
+static const fixed* getBonusNX (int width) {
+	if (bonusNXWidth != width) {
+		delete[] bonusNX;
+		bonusNX = new fixed[width];
+		for (int i = 0; i < width; i++) bonusNX[i] = ITOF(i) / width;
+		bonusNXWidth = width;
+	}
+	return bonusNX;
+}
+
+
 /**
  * Draw the level.
  */
@@ -654,6 +672,10 @@ void JJ1BonusLevel::draw () {
 
 	if (SDL_MUSTLOCK(canvas)) SDL_LockSurface(canvas);
 
+	const fixed* nXTable = getBonusNX(canvasW);
+	unsigned char* tilePixels = static_cast<unsigned char*>(tileSet->pixels);
+	int tilePitch = tileSet->pitch;
+
 	for (y = 1; y <= (canvasH >> 1) - 15; y++) {
 
 		fixed distance = DIV(ITOF(800), ITOF(92) - (ITOF(y * 84) / ((canvasH >> 1) - 16)));
@@ -666,13 +688,12 @@ void JJ1BonusLevel::draw () {
 
 		for (x = 0; x < canvasW; x++) {
 
-			fixed nX = ITOF(x) / canvasW;
+			fixed nX = nXTable[x];
 			int levelX = FTOI(fwdX + MUL(nX, sideX));
 			int levelY = FTOI(fwdY + MUL(nX, sideY));
 
-			row[x] = static_cast<unsigned char*>(tileSet->pixels)
-				[(grid[ITOT(levelY) & 255][ITOT(levelX) & 255].tile << 10) +
-					((levelY & 31) * tileSet->pitch) + (levelX & 31)];
+			row[x] = tilePixels[(grid[ITOT(levelY) & 255][ITOT(levelX) & 255].tile << 10)
+				+ ((levelY & 31) * tilePitch) + (levelX & 31)];
 
 		}
 
