@@ -32,9 +32,12 @@ extern "C" {
 }
 
 namespace {
-	// Instance JSON binds openjazz_N.sav to save slots 10..14; OpenJazz opens
-	// SAVE.0..SAVE.3 and openjazz.cfg by bare name, so alias them here.
-	const struct { unsigned slot; const char* name; } saveBindings[] = {
+	// The instance JSON decides which file fills each slot; the game asks for
+	// names. Bind the names to the slots so the file on the card can be called
+	// anything: every instance JSON then gets its own image and its own saves,
+	// which is how one core offers more than one release of the game.
+	const struct { unsigned slot; const char* name; } slotBindings[] = {
+		{ 4, "jazz.iso"},
 		{10, "SAVE.0"}, {11, "SAVE.1"}, {12, "SAVE.2"}, {13, "SAVE.3"},
 		{14, "openjazz.cfg"}
 	};
@@ -46,7 +49,7 @@ void OpenfpgaPlatform::AddGamePaths() {
 	// Desktop build: game data in ./jazz/, config and saves in cwd
 	gamePaths.add(createString("jazz" OJ_DIR_SEP_STR), PATH_TYPE_SYSTEM|PATH_TYPE_GAME);
 #else
-	for (auto& b : saveBindings)
+	for (auto& b : slotBindings)
 		of_file_slot_register(b.slot, b.name);
 
 	if (of_iso_mount("jazz.iso", "/jazz") == 0) {
